@@ -1,5 +1,10 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import Posts from '../screens/posts'
+import Chats from '../screens/chats'
+import UserProfile from '../screens/userProfile'
+
+const Tab = createMaterialBottomTabNavigator();
 
 type MainProps = {
     navigation: any,
@@ -8,19 +13,24 @@ type MainProps = {
 
 const Main: React.FC<MainProps> = (props) => {
     return(
-        <View style = {styles.container}>
-            <Text>Hello, { props.userData.name} </Text>
-        </View>
+        <Tab.Navigator initialRouteName = 'posts'>
+             
+            <Tab.Screen name = 'posts'>
+                { (navigation) => <Posts navigation = {navigation} userData = {props.userData}/> }
+            </Tab.Screen>
+
+            <Tab.Screen name = 'chats'>
+                { () => <Chats /> }
+            </Tab.Screen>
+
+            <Tab.Screen name = 'userProfile'>
+                { () => <UserProfile /> }
+            </Tab.Screen>
+
+        </Tab.Navigator>
     )
 }
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-});
+
 
 export default Main;
