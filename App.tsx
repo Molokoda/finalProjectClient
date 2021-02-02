@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 export default function App() {
 
-  const [userData, setUserData] = useState( {name: '' } );
+  const [userData, setUserData] = useState( {login: '' } );
 
   return (
     <NavigationContainer>

@@ -8,7 +8,7 @@ const Tab = createMaterialBottomTabNavigator();
 
 type MainProps = {
     navigation: any,
-    userData: { name: string}
+    userData: { login: string }
 }
 
 const Main: React.FC<MainProps> = (props) => {
@@ -24,7 +24,7 @@ const Main: React.FC<MainProps> = (props) => {
             </Tab.Screen>
 
             <Tab.Screen name = 'userProfile'>
-                { () => <UserProfile /> }
+                { () => <UserProfile userData = {props.userData} /> }
             </Tab.Screen>
 
         </Tab.Navigator>

@@ -22,7 +22,7 @@ async function loginUser(login: string, password: string, setUserData: any, navi
             alert(userDataFronServer);
         }
         else{
-            setUserData( {name: userDataFronServer[0].name} );
+            setUserData( {login: userDataFronServer[0].login} );
             navigation.navigation.navigate('main');
         }
     }
