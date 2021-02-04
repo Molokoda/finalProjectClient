@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { View, Text, StyleSheet, Button } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler';
 
 type MainProps = {
     userData: {login: string, friends: string[] },
@@ -53,7 +54,7 @@ const People: React.FC<MainProps> = (props) => {
                     if(props.userData.friends){
                         
                         let isFriend = props.userData.friends.find( (friend) => friend === user.login )
-                        if(isFriend){
+                        if(isFriend || user.login === props.userData.login){
                             answer = false;
                         }
                         else{
@@ -82,36 +83,38 @@ const People: React.FC<MainProps> = (props) => {
     }
     else{
         return(
-            <View style = {styles.container}>
-                <View>
-                    <Text>Friends: </Text>
-                    { 
-                        
-                            props.userData.friends.map( (friend: string, index: number) => {
+            <ScrollView>
+                <View style = {styles.container}>
+                    <View>
+                        <Text>Friends: </Text>
+                        { 
+                            
+                                props.userData.friends.map( (friend: string, index: number) => {
+                                    return(
+                                        <View key = {index}>
+                                            <Text key = {index}>{friend}</Text> 
+                                            <Button title = 'delete' onPress = { () => { changeFriends( friend ) } } />
+                                        </View>
+                                    )
+                                } )
+                            
+                        }      
+                    </View>
+                    <View>
+                        <Text>Other Users: </Text>
+                        { 
+                            arrayOfOtherUsers.map( (user: {login: string}, index: number) => {
                                 return(
                                     <View key = {index}>
-                                        <Text key = {index}>{friend}</Text> 
-                                        <Button title = 'delete' onPress = { () => { changeFriends( friend ) } } />
-                                     </View>
+                                        <Text key = {index}>{user.login}</Text> 
+                                        <Button title = 'add' onPress = { () => { changeFriends( user.login ) } } />
+                                    </View>
                                 )
                             } )
-                        
-                    }      
+                        }       
+                    </View>
                 </View>
-                <View>
-                    <Text>Other Users: </Text>
-                    { 
-                        arrayOfOtherUsers.map( (user: {login: string}, index: number) => {
-                            return(
-                                <View key = {index}>
-                                    <Text key = {index}>{user.login}</Text> 
-                                    <Button title = 'add' onPress = { () => { changeFriends( user.login ) } } />
-                                </View>
-                            )
-                        } )
-                    }       
-                </View>
-            </View>
+            </ScrollView>
         )
     }
     

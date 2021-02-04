@@ -115,6 +115,7 @@ const UserProfile: React.FC<MainProps> = (props) => {
           body: formData
       })  
       setArrayOfPosts(tempArray);
+      setIsLoading(true);
     }
   }
 
@@ -160,6 +161,7 @@ const UserProfile: React.FC<MainProps> = (props) => {
           body: formData
       })  
       setArrayOfPosts(tempArray);
+      setIsLoading(true);
     }
 
   }
