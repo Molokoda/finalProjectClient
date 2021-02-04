@@ -19,7 +19,7 @@ function uuidv4() {
 }
 
 type MainProps = {
-    userData: {login: string}
+    userData: {login: string, friends: string[]}
 }
 
 const UserProfile: React.FC<MainProps> = (props) => {

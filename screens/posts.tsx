@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native'
 
 type MainProps = {
     navigation: any,
-    userData: { login: string}
+    userData: { login: string, friends: string[] }
 }
 
 const Posts: React.FC<MainProps> = (props) => {

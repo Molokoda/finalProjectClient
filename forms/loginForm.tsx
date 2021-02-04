@@ -17,12 +17,12 @@ async function loginUser(login: string, password: string, setUserData: any, navi
             },
             body: JSON.stringify(userData)
         });
-        let userDataFronServer = await response.json();
-        if(userDataFronServer === 'login or password wrong'){
-            alert(userDataFronServer);
+        let userDataFromServer = await response.json();
+        if(userDataFromServer === 'login or password wrong'){
+            alert(userDataFromServer);
         }
         else{
-            setUserData( {login: userDataFronServer[0].login} );
+            setUserData( {login: userDataFromServer[0].login, friends: userDataFromServer[0].friends} );
             navigation.navigation.navigate('main');
         }
     }
