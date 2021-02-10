@@ -1,11 +1,25 @@
 import React, {useState, useEffect} from 'react'
-import { View, Text, StyleSheet, Button } from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 
+const messageButton = require('../assets/comment.png');
+const deleteButton = require('../assets/delete.png');
+const addButton = require('../assets/add.png');
+
 type MainProps = {
-    userData: {login: string, friends: string[] },
+    userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
     setUserData: any
 }
+const window = Dimensions.get('window');
+
+function uuidv4() {
+    return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+
 
 const People: React.FC<MainProps> = (props) => {
 
@@ -44,9 +58,47 @@ const People: React.FC<MainProps> = (props) => {
         
     }
 
+    const startChat = async(login: string) => {
+        let isExist = false;
+        console.log(props.userData.chats.length);
+        props.userData.chats.forEach( (chat) => {
+            if( chat.users.find( (user) => user === login) ){
+                isExist = true;
+            }
+        });
+
+        if( isExist ){
+            console.log('We here');
+
+        }
+        else{
+            console.log('We here 2');
+            let response = await fetch('http://192.168.100.88:3000/users/chats/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify( {users: [props.userData.login, login], id: uuidv4().slice(0, 24) } ) 
+            })
+
+            let newChat = await response.json();
+            response = await fetch('http://192.168.100.88:3000/users/addchat', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify( { users: [props.userData.login, login], chat: newChat } ) 
+            })
+            let old = props.userData;
+            old.chats.push(newChat);
+            props.setUserData( old );
+        }
+    }
+
     useEffect( () => {
         if(isLoading){
             (async() => {
+                console.log(props.userData);
                 let response = await fetch('http://192.168.100.88:3000/users/allusers', {method: 'GET'});
                 let arrayOfUser = await response.json();
                 let arrayOfOtherUsers = arrayOfUser.filter( (user: {login: string}) => {
@@ -85,29 +137,43 @@ const People: React.FC<MainProps> = (props) => {
         return(
             <ScrollView>
                 <View style = {styles.container}>
-                    <View>
-                        <Text>Friends: </Text>
+                    <View style = {styles.friendsContainer}>
+                        <Text style = {styles.title}>Friends: </Text>
                         { 
                             
-                                props.userData.friends.map( (friend: string, index: number) => {
-                                    return(
-                                        <View key = {index}>
-                                            <Text key = {index}>{friend}</Text> 
-                                            <Button title = 'delete' onPress = { () => { changeFriends( friend ) } } />
+                            props.userData.friends.map( (friend: string, index: number) => {
+                                return(
+                                    <View key = {index} style = {styles.frinedContainer}>
+                                        <Text key = {index}>{friend}</Text> 
+                                        <View style = {styles.buttonContainer}>
+                                            <TouchableOpacity onPress = { () => { startChat(friend) } }>
+                                                <Image source = {messageButton} style = { styles.button }/>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( friend ) } }>
+                                                <Image source = {deleteButton} style = { styles.button }/>
+                                            </TouchableOpacity>
                                         </View>
-                                    )
-                                } )
+                                    </View>
+                                )
+                            } )
                             
                         }      
                     </View>
-                    <View>
-                        <Text>Other Users: </Text>
+                    <View style = {styles.friendsContainer}>
+                        <Text style = {styles.title}>Other Users: </Text>
                         { 
                             arrayOfOtherUsers.map( (user: {login: string}, index: number) => {
                                 return(
-                                    <View key = {index}>
+                                    <View key = {index} style = {styles.frinedContainer}>
                                         <Text key = {index}>{user.login}</Text> 
-                                        <Button title = 'add' onPress = { () => { changeFriends( user.login ) } } />
+                                        <View style = {styles.buttonContainer}>
+                                                <TouchableOpacity onPress = { () => { startChat(user.login) } } >
+                                                    <Image source = {messageButton} style = { styles.button }/>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( user.login ) } }>
+                                                    <Image source = {addButton} style = { styles.button }/>
+                                                </TouchableOpacity>
+                                            </View>
                                     </View>
                                 )
                             } )
@@ -122,11 +188,39 @@ const People: React.FC<MainProps> = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
+
+    friendsContainer: {
+        width: window.width
+    },
+
+    frinedContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 5,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: window.width,
+        borderBottomWidth: 1,
+    },
+
+    title: {
+        fontSize: 16
+    },
+
+    button: {
+        width: 32, 
+        height: 32,
+        marginLeft: 5
+    },
+
+    buttonContainer: {
+        flexDirection: 'row'
+    }
 });
 
 export default People;

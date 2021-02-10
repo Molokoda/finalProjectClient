@@ -22,7 +22,12 @@ async function loginUser(login: string, password: string, setUserData: any, navi
             alert(userDataFromServer);
         }
         else{
-            setUserData( {login: userDataFromServer[0].login, friends: userDataFromServer[0].friends} );
+            setUserData( {
+                login: userDataFromServer[0].login, 
+                friends: userDataFromServer[0].friends, 
+                chats: userDataFromServer[0].chats,
+                avatar: userDataFromServer[0].avatar
+            } );
             navigation.navigation.navigate('main');
         }
     }

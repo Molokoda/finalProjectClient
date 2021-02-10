@@ -5,13 +5,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginForm from './forms/loginForm'
 import RegForm from './forms/regForm'
 import Main from './screens/main'
-
+import Chat from './components/chat'
 
 const Stack = createStackNavigator();
 
 export default function App() {
 
-  const [userData, setUserData] = useState( {login: '', friends: [''] } );
+  const [userData, setUserData] = useState( {login: '', friends: [''], chats: [ { _id: '', users: [''] } ], avatar: '' } );
+  const [chatInfo, setChatInfo] = useState( { _id: '', users: [''] } )
 
   return (
     <NavigationContainer>
@@ -36,7 +37,11 @@ export default function App() {
         </Stack.Screen>
 
         <Stack.Screen  name = 'main'>
-          { (navigation) => <Main navigation = {navigation} userData = {userData} setUserData = {setUserData}/> }
+          { (navigation) => <Main navigation = {navigation} userData = {userData} setUserData = {setUserData} setChatInfo = {setChatInfo} /> }
+        </Stack.Screen>
+
+        <Stack.Screen name = 'chat'>
+          { (navigation) => <Chat chatInfo = {chatInfo} userData = {userData}/> }
         </Stack.Screen>
 
       </Stack.Navigator>

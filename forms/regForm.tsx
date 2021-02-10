@@ -9,7 +9,7 @@ async function regUser(login: string, password: string, name: string, navigation
         alert(validate.error);
     }
     else{
-        let userData = {login: login, password: password, name: name, friends: []}
+        let userData = {login: login, password: password, name: name, friends: [], chats: [ { _id: '', users: [''] } ], avata: '' }
 
         let response = await fetch('http://192.168.100.88:3000/users/reg', {
             method: 'POST',

@@ -9,8 +9,9 @@ const Tab = createMaterialBottomTabNavigator();
 
 type MainProps = {
     navigation: any,
-    userData: { login: string, friends: string[] },
-    setUserData: any
+    userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
+    setUserData: any,
+    setChatInfo: any
 }
 
 const Main: React.FC<MainProps> = (props) => {
@@ -30,7 +31,7 @@ const Main: React.FC<MainProps> = (props) => {
             </Tab.Screen>
 
             <Tab.Screen name = 'chats'>
-                { () => <Chats /> }
+                { () => <Chats userData = {props.userData} setUserData = {props.setUserData} setChatInfo = {props.setChatInfo} navigation = {props.navigation}/> }
             </Tab.Screen>
 
             

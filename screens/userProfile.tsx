@@ -1,8 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import { View, Text, StyleSheet, Button, Platform, Image } from 'react-native'
 import * as ImagePicker from 'expo-image-picker';
-import { ScrollView } from 'react-native-gesture-handler';
-const axios = require('axios').default;
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+
+const like = require('../assets/like.png');
+const liked = require('../assets/liked.png');
+const comment = require('../assets/comment.png');
+const close = require('../assets/delete.png');
 
 
 function getCurrentDate(){
@@ -19,12 +23,12 @@ function uuidv4() {
 }
 
 type MainProps = {
-    userData: {login: string, friends: string[]}
+  userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
 }
 
 const UserProfile: React.FC<MainProps> = (props) => {
 
-  const [arrayOfPosts, setArrayOfPosts] = useState([{id: '', uri: '', date: '', author: ''}]);
+  const [arrayOfPosts, setArrayOfPosts] = useState( [ {id: '', uri: '', date: '', author: '', likes: [''], comments: [ {author: '', date: '', text: ''} ] } ] );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -43,14 +47,15 @@ const UserProfile: React.FC<MainProps> = (props) => {
             method: 'GET'
           })
         let arrayofData = await response.json();
-        let correctFiledArray = [{id: '', uri: '', date: '', author: ''}];
-        arrayofData.forEach( (element: {_id: string, author: string, date: string, path: string }, index: number) => {
+        let correctFiledArray = [ {id: '', uri: '', date: '', author: '', likes: [''], comments: [ {author: '', date: '', text: ''} ] } ];
+        arrayofData.forEach( (element: {_id: string, author: string, date: string, path: string, likes: string[], comments: [ {author: string, date: string, text: string} ] }, index: number) => {
           correctFiledArray[index] = {
             id: element._id,
             uri: ('http://192.168.100.88:3000/public/images/' +  element.path.slice(42)),
             date: element.date,
-            author: element.author
-
+            author: element.author,
+            likes: element.likes,
+            comments: element.comments
           }
         })
         setArrayOfPosts(correctFiledArray);
@@ -83,9 +88,22 @@ const UserProfile: React.FC<MainProps> = (props) => {
     let tempArray = arrayOfPosts;
     let formData = new FormData();    
     if(!result.cancelled && arrayOfPosts[0].uri === ''){
-      tempArray = [ {id: uuidv4().slice(0, 24), uri: result.uri, date: getCurrentDate(), author: props.userData.login } ]
+      tempArray = [ {
+        id: uuidv4().slice(0, 24), 
+        uri: result.uri, 
+        date: getCurrentDate(), 
+        author: props.userData.login,
+        likes: [],
+        comments: []
+      } ]
       setArrayOfPosts(tempArray);
-      let postData = {id: tempArray[tempArray.length - 1].id, date: tempArray[tempArray.length - 1].date, author: tempArray[tempArray.length - 1].author };
+      let postData = {
+        id: tempArray[tempArray.length - 1].id, 
+        date: tempArray[tempArray.length - 1].date, 
+        author: tempArray[tempArray.length - 1].author,
+        likes: tempArray[tempArray.length - 1].likes,
+        comments: tempArray[tempArray.length - 1].comments,
+      };
       for(let key in postData){
         formData.append(`${key}`, postData[key] )
       }
@@ -100,8 +118,21 @@ const UserProfile: React.FC<MainProps> = (props) => {
       })                
     }
     else if(!result.cancelled){
-      tempArray.push( { id: uuidv4().slice(0, 24), uri: result.uri, date: getCurrentDate(), author: props.userData.login } );
-      let postData = {id: tempArray[tempArray.length - 1].id, date: tempArray[tempArray.length - 1].date, author: tempArray[tempArray.length - 1].author };
+      tempArray.push( { 
+        id: uuidv4().slice(0, 24), 
+        uri: result.uri, 
+        date: getCurrentDate(), 
+        author: props.userData.login,
+        likes: [],
+        comments: []
+      } );
+      let postData = {
+        id: tempArray[tempArray.length - 1].id, 
+        date: tempArray[tempArray.length - 1].date, 
+        author: tempArray[tempArray.length - 1].author,
+        likes: tempArray[tempArray.length - 1].likes,
+        comments: tempArray[tempArray.length - 1].comments,
+      };
       for(let key in postData){
         formData.append(`${key}`, postData[key] )
       }
@@ -114,8 +145,8 @@ const UserProfile: React.FC<MainProps> = (props) => {
           
           body: formData
       })  
-      setArrayOfPosts(tempArray);
       setIsLoading(true);
+      setArrayOfPosts(tempArray);
     }
   }
 
@@ -129,9 +160,22 @@ const UserProfile: React.FC<MainProps> = (props) => {
     let formData = new FormData();   
     let tempArray = arrayOfPosts;
     if(!result.cancelled && arrayOfPosts[0].uri === ''){
-      tempArray = [ {id: uuidv4().slice(0, 24), uri: result.uri, date: getCurrentDate(), author: props.userData.login } ]
+      tempArray = [ {
+        id: uuidv4().slice(0, 24),
+        uri: result.uri, 
+        date: getCurrentDate(), 
+        author: props.userData.login, 
+        likes: [],
+        comments: []
+      }]  
       setArrayOfPosts(tempArray);
-      let postData = {id: tempArray[tempArray.length - 1].id, date: tempArray[tempArray.length - 1].date, author: tempArray[tempArray.length - 1].author };
+      let postData = {
+        id: tempArray[tempArray.length - 1].id, 
+        date: tempArray[tempArray.length - 1].date, 
+        author: tempArray[tempArray.length - 1].author,
+        likes: tempArray[tempArray.length - 1].likes,
+        comments: tempArray[tempArray.length - 1].comments,
+      };
       for(let key in postData){
         formData.append(`${key}`, postData[key] )
       }
@@ -146,8 +190,21 @@ const UserProfile: React.FC<MainProps> = (props) => {
       })                
     }
     else if(!result.cancelled){
-      tempArray.push( { id: uuidv4().slice(0, 24), uri: result.uri, date: getCurrentDate(), author: props.userData.login } );
-      let postData = {id: tempArray[tempArray.length - 1].id, date: tempArray[tempArray.length - 1].date, author: tempArray[tempArray.length - 1].author };
+      tempArray.push( { 
+        id: uuidv4().slice(0, 24), 
+        uri: result.uri, 
+        date: getCurrentDate(), 
+        author: props.userData.login,
+        likes: [],
+        comments: []
+      } );
+      let postData = {
+        id: tempArray[tempArray.length - 1].id, 
+        date: tempArray[tempArray.length - 1].date, 
+        author: tempArray[tempArray.length - 1].author,
+        likes: tempArray[tempArray.length - 1].likes,
+        comments: tempArray[tempArray.length - 1].comments,
+      };
       for(let key in postData){
         formData.append(`${key}`, postData[key] )
       }
@@ -160,22 +217,79 @@ const UserProfile: React.FC<MainProps> = (props) => {
           
           body: formData
       })  
-      setArrayOfPosts(tempArray);
       setIsLoading(true);
+      setArrayOfPosts(tempArray);
     }
 
   }
   
-  
+  const deletePost = async(postIDForDelete: string, path: string) => {
+    console.log(postIDForDelete);
+    let temp = arrayOfPosts;
+    let isDeleteFriendFind = false;
+    for(let i = 0; i < temp.length - 1; i++){
+        if( temp[i].id === postIDForDelete || isDeleteFriendFind){
+          temp[i] = temp[ i + 1 ];
+          isDeleteFriendFind = true;
+        }
+    }
+    temp.length = temp.length - 1;
+    await fetch('http://192.168.100.88:3000/users/posts/delete', {
+      method: 'DELETE',
+      headers:{
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+
+      body: JSON.stringify( { id: postIDForDelete, path: path} )
+    })
+    setArrayOfPosts(temp);
+  }
+
+  const likePost = async( arrayOfUsers: string[], postNumber: number) => {
+    let temp = arrayOfPosts;
+    postNumber = temp.length - postNumber - 1;
+    if( arrayOfUsers.find( (user) => props.userData.login === user)){
+      let isDeleteFind = false;
+      for( let i = 0; i < temp[postNumber].likes.length - 1; i++){
+        if( temp[postNumber].likes[i] === props.userData.login || isDeleteFind){
+          temp[postNumber].likes[i] = temp[postNumber].likes[ i + 1 ];
+          isDeleteFind = true;
+        }
+      }
+      temp[postNumber].likes.length -= 1;
+    }
+    else{
+      temp[postNumber].likes.push(props.userData.login);
+      
+      
+    }
+    await fetch( 'http://192.168.100.88:3000/users/posts/dislike', {
+        method: 'PUT',
+        headers: {
+          'Content-Type' : 'application/json; charset = utf-8'
+        },
+        body: JSON.stringify( {id: temp[postNumber].id, likes: temp[postNumber].likes} )
+    })
+    setArrayOfPosts( temp );
+    setIsLoading(true);
+  }
+
   return(
     <ScrollView>
       <View style = {styles.container}>
-          <Text>It will be UserProfile </Text>
+          <Text>{props.userData.login}</Text>
           <Button title = 'add post from gallery' onPress = { takePhotoFromLibrary }/>
           <Button title = 'add post from camera' onPress = { takePhotoFromCamera }/>
           <View>
               { 
               arrayOfPosts.slice(0).reverse().map( (post, index) => {
+                  let picture;
+                  if( post.likes.find( (user) => {return props.userData.login === user} ) ){
+                    picture = liked;
+                  }
+                  else{
+                    picture = like;
+                  }
                   if(arrayOfPosts[0].uri === ''){
                     return(
                       <View key = {index} ></View>
@@ -183,9 +297,33 @@ const UserProfile: React.FC<MainProps> = (props) => {
                   }
                   else{
                     return(
-                      <View key = {index}>
-                        <Text>Author: {post.author}, date: { post.date }, id {post.id}</Text>
+                      <View key = {index} style = {styles.containerPost}>
+                        <View style = { styles.postHeader}>
+                          <Text>{post.author}</Text>
+                          <TouchableOpacity onPress = { () => { deletePost( post.id, post.uri ) } } >
+                            <Image style = { { width: 16, height: 16 } } source = { close } />
+                          </TouchableOpacity>
+                        </View>
                         <Image  style = {{ width: 200, height: 100, resizeMode: 'cover'}} source={ {uri: post.uri} }/>
+                        <View style = {styles.postFooter}>
+                          <Text>{ post.date } </Text>
+                          <View style = {styles.like}>
+                            <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
+                              <Image 
+                                style = { { width: 16, height: 16}} 
+                                source = { picture }
+                              />
+                            </TouchableOpacity>
+                            <Text> { post.likes.length } </Text>
+                            <TouchableOpacity>
+                              <Image 
+                                style = { { width: 24, height: 16} } 
+                                source = {  comment } 
+                              />
+                            </TouchableOpacity>
+                            <Text> { post.comments.length } </Text>
+                          </View>
+                        </View>
                       </View>
                     )
                   }
@@ -201,10 +339,46 @@ const UserProfile: React.FC<MainProps> = (props) => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
+      paddingBottom: 100,
       backgroundColor: '#fff',
       alignItems: 'center',
-      justifyContent: 'center',
+      
     },
+    
+    postHeader: {
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      alignContent: 'center',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: 200,
+    },
+
+    containerPost: {
+      flex: 1,
+      paddingLeft: 0,
+      backgroundColor: '#fff',
+      alignItems: 'flex-start',
+    },
+
+    postFooter: {
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'nowrap',
+      alignContent: 'center',
+      alignItems: 'center',
+      width: 200,
+      justifyContent: 'space-between'
+    },
+
+    like: {
+      flex: 1,
+      flexDirection: 'row',
+      alignContent: 'center',
+      alignItems: 'center',
+      justifyContent: 'flex-end'
+    }
 });
 
 export default UserProfile;
