@@ -5,13 +5,15 @@ import Chats from '../screens/chats'
 import UserProfile from '../screens/userProfile'
 import People from '../screens/people'
 
+
 const Tab = createMaterialBottomTabNavigator();
 
 type MainProps = {
     navigation: any,
     userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
     setUserData: any,
-    setChatInfo: any
+    setChatInfo: any,
+    setArrayOfComments: any
 }
 
 const Main: React.FC<MainProps> = (props) => {
@@ -19,11 +21,11 @@ const Main: React.FC<MainProps> = (props) => {
         <Tab.Navigator initialRouteName = 'userProfile'>
              
             <Tab.Screen name = 'userProfile'>
-                { () => <UserProfile userData = {props.userData} /> }
+                { () => <UserProfile navigation = {props.navigation}  userData = {props.userData} setArrayOfComments = {props.setArrayOfComments}/> }
             </Tab.Screen>
 
             <Tab.Screen name = 'posts'>
-                { (navigation) => <Posts navigation = {navigation} userData = {props.userData}/> }
+                { () => <Posts navigation = {props.navigation} userData = {props.userData} setArrayOfComments = {props.setArrayOfComments}/> }
             </Tab.Screen>
 
             <Tab.Screen name = 'people'>
@@ -33,8 +35,6 @@ const Main: React.FC<MainProps> = (props) => {
             <Tab.Screen name = 'chats'>
                 { () => <Chats userData = {props.userData} setUserData = {props.setUserData} setChatInfo = {props.setChatInfo} navigation = {props.navigation}/> }
             </Tab.Screen>
-
-            
 
         </Tab.Navigator>
     )

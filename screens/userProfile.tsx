@@ -24,6 +24,8 @@ function uuidv4() {
 
 type MainProps = {
   userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
+  setArrayOfComments: any,
+  navigation: any,
 }
 
 const UserProfile: React.FC<MainProps> = (props) => {
@@ -63,7 +65,7 @@ const UserProfile: React.FC<MainProps> = (props) => {
       })();
       
     }
-  }, []);
+  }, [isLoading]);
 
   useEffect(() => {
     (async () => {
@@ -274,6 +276,11 @@ const UserProfile: React.FC<MainProps> = (props) => {
     setIsLoading(true);
   }
 
+  const goToComments = (comments: { author: string, data: string, text: string}[], postID: string) => {
+    props.setArrayOfComments( { comments: comments, postID: postID} );
+    props.navigation.navigation.navigate('comments');
+  }
+
   return(
     <ScrollView>
       <View style = {styles.container}>
@@ -315,12 +322,12 @@ const UserProfile: React.FC<MainProps> = (props) => {
                               />
                             </TouchableOpacity>
                             <Text> { post.likes.length } </Text>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress = { () => { goToComments(post.comments, post.id) } } >
                               <Image 
                                 style = { { width: 24, height: 16} } 
                                 source = {  comment } 
                               />
-                            </TouchableOpacity>
+                            </TouchableOpacity >
                             <Text> { post.comments.length } </Text>
                           </View>
                         </View>

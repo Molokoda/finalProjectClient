@@ -6,13 +6,15 @@ import LoginForm from './forms/loginForm'
 import RegForm from './forms/regForm'
 import Main from './screens/main'
 import Chat from './components/chat'
+import Comments from './screens/comments'
 
 const Stack = createStackNavigator();
 
 export default function App() {
 
   const [userData, setUserData] = useState( {login: '', friends: [''], chats: [ { _id: '', users: [''] } ], avatar: '' } );
-  const [chatInfo, setChatInfo] = useState( { _id: '', users: [''] } )
+  const [chatInfo, setChatInfo] = useState( { _id: '', users: [''] } );
+  const [arrayOfComments, setArrayOfComments] = useState( { comments: [ {author: '', data: '', text: '',  avatar: ''} ], postID: '' } );
 
   return (
     <NavigationContainer>
@@ -37,11 +39,21 @@ export default function App() {
         </Stack.Screen>
 
         <Stack.Screen  name = 'main'>
-          { (navigation) => <Main navigation = {navigation} userData = {userData} setUserData = {setUserData} setChatInfo = {setChatInfo} /> }
+          { (navigation) => <Main 
+            navigation = {navigation} 
+            userData = {userData} 
+            setUserData = {setUserData}  
+            setChatInfo = {setChatInfo} 
+            setArrayOfComments = {setArrayOfComments}
+          /> }
         </Stack.Screen>
 
         <Stack.Screen name = 'chat'>
-          { (navigation) => <Chat chatInfo = {chatInfo} userData = {userData}/> }
+          { () => <Chat chatInfo = {chatInfo} userData = {userData}/> }
+        </Stack.Screen>
+
+        <Stack.Screen name = 'comments'>
+          { () => <Comments arrayOfComments = {arrayOfComments} userData = {userData}/> }
         </Stack.Screen>
 
       </Stack.Navigator>

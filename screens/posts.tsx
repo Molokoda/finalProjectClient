@@ -5,6 +5,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 type MainProps = {
     navigation: any,
     userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
+    setArrayOfComments: any
 }
 
 const like = require('../assets/like.png');
@@ -71,6 +72,11 @@ const Posts: React.FC<MainProps> = (props) => {
         setIsLoading(true);
     }
 
+    const goToComments = (comments: { author: string, data: string, text: string}[], postID: string)  => {
+        props.setArrayOfComments( { comments: comments, postID: postID} );
+        props.navigation.navigation.navigate('comments');
+    }
+
     if(isLoading){
         return(
             <Text>Is loading</Text>
@@ -105,17 +111,17 @@ const Posts: React.FC<MainProps> = (props) => {
                                         <Text>{ post.date } </Text>
                                         <View style = {styles.like}>
                                             <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
-                                            <Image 
-                                                style = { { width: 16, height: 16}} 
-                                                source = { picture }
-                                            />
+                                                <Image 
+                                                    style = { { width: 16, height: 16}} 
+                                                    source = { picture }
+                                                />
                                             </TouchableOpacity>
                                             <Text> { post.likes.length } </Text>
-                                            <TouchableOpacity>
-                                            <Image 
-                                                style = { { width: 24, height: 16} } 
-                                                source = {  comment } 
-                                            />
+                                            <TouchableOpacity onPress = { () => { goToComments(post.comments , post.id) } } >
+                                                <Image 
+                                                    style = { { width: 24, height: 16} } 
+                                                    source = {  comment } 
+                                                />
                                             </TouchableOpacity>
                                             <Text> { post.comments.length } </Text>
                                         </View>

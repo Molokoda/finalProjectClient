@@ -20,25 +20,25 @@ const Chat: React.FC<ChatProps> = (props) => {
     socket.on(`${props.chatInfo._id}::${props.userData.login}`, (data) => {
       console.log('somedata', data);
       setMessages(previousMessages => GiftedChat.append(previousMessages, data.message));
-      socket.removeListener(`${props.chatInfo._id}::${props.userData.login}`, data);
-      
+      socket.removeListener(`${props.chatInfo._id}::${props.userData.login}`, data); 
     } ); 
-      if( !isMessagesGet){
-        
-        ( async() => {
-          let response = await fetch(`http://192.168.100.88:3000/users/chats/getchat?_id=${props.chatInfo._id}`, {
-            method: 'GET',
-          });
-          let arrayOfMessages = await response.json();
-          console.log(arrayOfMessages.messages);
-          if(arrayOfMessages.messages.length > 0){
-            arrayOfMessages.messages.map( ( message ) => {
-              setMessages(previousMessages => GiftedChat.append(previousMessages, message))
-            })
-          }
-          setIsMessagesGet(true);
-        } )()
-      }
+
+    if( !isMessagesGet){
+      
+      ( async() => {
+        let response = await fetch(`http://192.168.100.88:3000/users/chats/getchat?_id=${props.chatInfo._id}`, {
+          method: 'GET',
+        });
+        let arrayOfMessages = await response.json();
+        console.log(arrayOfMessages.messages);
+        if(arrayOfMessages.messages.length > 0){
+          arrayOfMessages.messages.map( ( message ) => {
+            setMessages(previousMessages => GiftedChat.append(previousMessages, message))
+          })
+        }
+        setIsMessagesGet(true);
+      } )()
+    }
   }, [])
   
   const onSend = useCallback((messages = []) => {
