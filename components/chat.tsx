@@ -42,7 +42,6 @@ const Chat: React.FC<ChatProps> = (props) => {
   }, [])
   
   const onSend = useCallback((messages = []) => {
-    console.log(messages);
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages));
     ( async() => {
       await fetch('http://192.168.100.88:3000/users/chats/addmessage', {
@@ -53,10 +52,14 @@ const Chat: React.FC<ChatProps> = (props) => {
         body: JSON.stringify( {_id: props.chatInfo._id, message: messages} )  
       })
     })();
-    console.log('send');
+    let arrayOfto = props.chatInfo.users.filter( ( user ) => { 
+      if( user !== props.userData.login ){
+        return true
+      }
+    } )
     socket.emit( 'private', { 
         _id: props.chatInfo._id, 
-        to: (props.userData.login === props.chatInfo.users[1] ? props.chatInfo.users[0] : props.chatInfo.users[1] ),
+        to: arrayOfto,
         message: messages 
       } );
   }, [])

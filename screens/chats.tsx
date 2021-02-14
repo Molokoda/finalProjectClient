@@ -25,10 +25,9 @@ const Chats: React.FC<MainProps> = (props) => {
             <View style = {styles.chatsPreviewContainer}>
                 {
                     props.userData.chats.map( (chat, index) => {
-                        return(
-                            
+                        return(              
                             <View style = {styles.chatPreviewContainer} key = {index}>
-                                <Text>Members: {chat.users[0] } , { chat.users[1] }</Text>
+                                <Text>Members: {chat.users.map( (user) => { return `${user}, `}) }</Text>
                                 <TouchableOpacity onPress = { () => { goToChat( chat ) } } >
                                     <Image source = {toChat} style = { styles.button } />
                                 </TouchableOpacity>
