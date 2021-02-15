@@ -18,11 +18,14 @@ type CommentProps = {
 const Comments: React.FC<CommentProps> = (props) => {
     let reset: any;
     const [comment, setComment] = useState('');
+    const [isRender, setIsRender] = useState(false);
     const [comments,  setComments] = useState(props.arrayOfComments.comments);
 
     useEffect( () => {
-        console.log(comments);
-    },[comments])
+        if(isRender){
+            setIsRender(false);
+        }
+    },[isRender])
 
     const addNewComment = async( newComment: string ) => {
         if(newComment === ''){
@@ -40,8 +43,8 @@ const Comments: React.FC<CommentProps> = (props) => {
             let temp = comments;
             temp.push(newFullCommnet);
             setComments(temp);
-            console.log(comments);
             reset.clear();
+            setIsRender(true);
         }
         
     }

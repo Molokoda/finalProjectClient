@@ -31,6 +31,7 @@ const People: React.FC<MainProps> = (props) => {
     const [arrayOfFriends, setArrayOfFriends] = useState( [ { name: '', isChoose: false } ] );
     const [arrayOfChoosenUsers] = useState( [''] );
     const [isRender, setIsRender] = useState(false);
+    const [finder, setFinder] = useState('');
 
     const changeFriends = ( friend: string) => {
 
@@ -237,7 +238,7 @@ const People: React.FC<MainProps> = (props) => {
             <ScrollView>
                 <View style = {styles.container}>
                     <View style = {styles.header}>
-                        <TextInput placeholder = {'Search user '} style = { styles.input }/>
+                        <TextInput placeholder = {'Search user '} style = { styles.input } onChangeText = { (event) =>  { setFinder(event) } }/>
                         <TouchableOpacity onPress = { () => { addGroupChat() } } >
                             <Image source = {group} style = { styles.button } />
                         </TouchableOpacity>
@@ -245,14 +246,17 @@ const People: React.FC<MainProps> = (props) => {
                     <View style = {styles.friendsContainer}>
                         <Text style = {styles.title}>Friends: </Text>
                         {
-                            arrayOfFriends.map( (friend, index: number) => {
+                            arrayOfFriends.filter( ( friend ) => { 
+                                    const reg: any =  RegExp(`^${finder}\w{0,}`); 
+                                    return friend.name.match(reg) 
+                                } ).map( (friend, index: number) => {
                                 return(
                                     <View key = {index} style = {styles.frinedContainer}>
                                         <Text key = {index}>{friend.name}</Text>
                                         <View style = {styles.buttonContainer}>
                                             <Checkbox
                                                 color={`green`}
-                                                uncheckedColor={`green`}
+                                                uncheckedColor={`grey`}
                                                 status={ friend.isChoose ? 'checked' : 'unchecked'}
                                                 onPress = { () => {changeCheck( friend.name, index, 'friend' ) } }
                                             />
@@ -271,14 +275,17 @@ const People: React.FC<MainProps> = (props) => {
                     <View style = {styles.friendsContainer}>
                         <Text style = {styles.title}>Other Users: </Text>
                         {
-                            arrayOfOtherUsers.map( (user: {name: string, isChoose: boolean }, index: number) => {
+                            arrayOfOtherUsers.filter( ( user ) => { 
+                                const reg: any =  RegExp(`^${finder}\w{0,}`); 
+                                return user.name.match(reg) 
+                            } ).map( (user: {name: string, isChoose: boolean }, index: number) => {
                                 return(
                                     <View key = {index} style = {styles.frinedContainer}>
                                         <Text key = {index}>{user.name}</Text>
                                         <View style = {styles.buttonContainer}>
                                             <Checkbox
                                                 color={`green`}
-                                                uncheckedColor={`green`}
+                                                uncheckedColor={`grey`}
                                                 status={ user.isChoose ? 'checked' : 'unchecked'}
                                                 onPress = { () => {changeCheck( user.name, index, 'other' ) } }
                                             />

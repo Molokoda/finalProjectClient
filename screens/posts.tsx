@@ -106,7 +106,7 @@ const Posts: React.FC<MainProps> = (props) => {
                                         <View style = { styles.postHeader}>
                                         <Text>{post.author}</Text>
                                         </View>
-                                        <Image  style = {{ width: 200, height: 100, resizeMode: 'cover'}} source={ {uri: post.uri} }/>
+                                        <Image  style = {{ width: 200, height: 300}} source={ {uri: post.uri} }/>
                                         <View style = {styles.postFooter}>
                                         <Text>{ post.date } </Text>
                                         <View style = {styles.like}>

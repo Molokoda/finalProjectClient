@@ -82,8 +82,6 @@ const UserProfile: React.FC<MainProps> = (props) => {
     
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
     
@@ -155,8 +153,6 @@ const UserProfile: React.FC<MainProps> = (props) => {
   const takePhotoFromCamera = async() => {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
     let formData = new FormData();   
@@ -284,60 +280,68 @@ const UserProfile: React.FC<MainProps> = (props) => {
   return(
     <ScrollView>
       <View style = {styles.container}>
-          <Text>{props.userData.login}</Text>
-          <Button title = 'add post from gallery' onPress = { takePhotoFromLibrary }/>
-          <Button title = 'add post from camera' onPress = { takePhotoFromCamera }/>
+        <View style = {styles.header}>
+          <Text style = { {fontSize: 16} }>{props.userData.login}</Text>
           <View>
-              { 
-              arrayOfPosts.slice(0).reverse().map( (post, index) => {
-                  let picture;
-                  if( post.likes.find( (user) => {return props.userData.login === user} ) ){
-                    picture = liked;
-                  }
-                  else{
-                    picture = like;
-                  }
-                  if(arrayOfPosts[0].uri === ''){
-                    return(
-                      <View key = {index} ></View>
-                    )
-                  }
-                  else{
-                    return(
-                      <View key = {index} style = {styles.containerPost}>
-                        <View style = { styles.postHeader}>
-                          <Text>{post.author}</Text>
-                          <TouchableOpacity onPress = { () => { deletePost( post.id, post.uri ) } } >
-                            <Image style = { { width: 16, height: 16 } } source = { close } />
+            <TouchableOpacity style = {styles.button} onPress = { takePhotoFromLibrary } >
+              <Text>add post from gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style = {styles.button} onPress = { takePhotoFromCamera }>
+              <Text>add post from camera</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View>
+            { 
+            arrayOfPosts.slice(0).reverse().map( (post, index) => {
+                let picture;
+                if( post.likes.find( (user) => {return props.userData.login === user} ) ){
+                  picture = liked;
+                }
+                else{
+                  picture = like;
+                }
+                if(arrayOfPosts[0].uri === ''){
+                  return(
+                    <View key = {index} ></View>
+                  )
+                }
+                else{
+                  return(
+                    <View key = {index} style = {styles.containerPost}>
+                      <View style = { styles.postHeader}>
+                        <Text>{post.author}</Text>
+                        <TouchableOpacity onPress = { () => { deletePost( post.id, post.uri ) } } >
+                          <Image style = { { width: 16, height: 16 } } source = { close } />
+                        </TouchableOpacity>
+                      </View>
+                      <Image  style = {{ width: 200, height: 300}} source={ {uri: post.uri} }/>
+                      <View style = {styles.postFooter}>
+                        <Text>{ post.date } </Text>
+                        <View style = {styles.like}>
+                          <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
+                            <Image 
+                              style = { { width: 16, height: 16}} 
+                              source = { picture }
+                            />
                           </TouchableOpacity>
-                        </View>
-                        <Image  style = {{ width: 200, height: 100, resizeMode: 'cover'}} source={ {uri: post.uri} }/>
-                        <View style = {styles.postFooter}>
-                          <Text>{ post.date } </Text>
-                          <View style = {styles.like}>
-                            <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
-                              <Image 
-                                style = { { width: 16, height: 16}} 
-                                source = { picture }
-                              />
-                            </TouchableOpacity>
-                            <Text> { post.likes.length } </Text>
-                            <TouchableOpacity onPress = { () => { goToComments(post.comments, post.id) } } >
-                              <Image 
-                                style = { { width: 24, height: 16} } 
-                                source = {  comment } 
-                              />
-                            </TouchableOpacity >
-                            <Text> { post.comments.length } </Text>
-                          </View>
+                          <Text> { post.likes.length } </Text>
+                          <TouchableOpacity onPress = { () => { goToComments(post.comments, post.id) } } >
+                            <Image 
+                              style = { { width: 24, height: 16} } 
+                              source = {  comment } 
+                            />
+                          </TouchableOpacity >
+                          <Text> { post.comments.length } </Text>
                         </View>
                       </View>
-                    )
-                  }
-                  
-                })
-              }
-          </View>
+                    </View>
+                  )
+                }
+                
+              })
+            }
+        </View>
       </View>
     </ScrollView>
   )
@@ -352,6 +356,13 @@ const styles = StyleSheet.create({
       
     },
     
+    header: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 10
+    },
+
     postHeader: {
       flex: 1,
       flexDirection: 'row',
@@ -385,6 +396,18 @@ const styles = StyleSheet.create({
       alignContent: 'center',
       alignItems: 'center',
       justifyContent: 'flex-end'
+    },
+
+    button: {
+      padding: 10,
+      alignItems: 'center',
+      backgroundColor: 'skyblue',
+      borderRadius: 10,
+      marginBottom: 10
+    },
+
+    buttonWrapper: {
+      flexDirection: 'column'
     }
 });
 
