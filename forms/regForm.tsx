@@ -42,7 +42,7 @@ const RegForm: React.FC<Props> = (props) => {
         <View style = {styles.container}>
             <View style = {{marginTop: 150}}>
                 <TextInput style = {styles.input} placeholder = 'Enter your login' onChangeText = { (event) => {setLogin(event)} }/>
-                <TextInput style = {styles.input} placeholder = 'Enter yout password' onChangeText = { (event) => {setPassword(event)} }/>
+                <TextInput secureTextEntry = {true} style = {styles.input} placeholder = 'Enter yout password' onChangeText = { (event) => {setPassword(event)} }/>
                 <TextInput style = {styles.input} placeholder = 'Enter yout name' onChangeText = { (event) => {setName(event)} }/>
                 <TouchableOpacity style = {styles.button} onPress = { () => {regUser(login, password, name, props.navigation)} }>
                     <Text style = { {color: 'white'} }>Sing Up</Text>

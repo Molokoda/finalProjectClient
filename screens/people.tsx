@@ -10,7 +10,9 @@ const group = require('../assets/group.png');
 
 type MainProps = {
     userData: { login: string, friends: string[], chats: { _id: string, users: string[] }[], avatar: string },
-    setUserData: any
+    setUserData: any,
+    setChatInfo: any,
+    navigation: any
 }
 
 const window = Dimensions.get('window');
@@ -62,20 +64,21 @@ const People: React.FC<MainProps> = (props) => {
             setIsLoading(true);
             props.setUserData( {...props.userData, friends: temp } );
         }
-
     }
 
     const startChat = async(login: string) => {
         let isExist = false;
+        let chatData;
         props.userData.chats.forEach( (chat) => {
             if( chat.users.find( (user) => user === login) && chat.users.length == 2 ){
                 isExist = true;
+                chatData = chat;
             }
         });
 
         if( isExist ){
-            console.log('We here');
-
+            props.setChatInfo( chatData );
+            props.navigation.navigation.navigate('chat');
         }
         else{
             let response = await fetch('http://192.168.100.88:3000/users/chats/create', {
@@ -97,6 +100,8 @@ const People: React.FC<MainProps> = (props) => {
             let old = props.userData;
             old.chats.push(newChat);
             props.setUserData( old );
+            props.setChatInfo( newChat );
+            props.navigation.navigation.navigate('chat');
         }
     }
 
@@ -220,7 +225,7 @@ const People: React.FC<MainProps> = (props) => {
 
             })()
         }
-    })
+    }, [isLoading])
 
     useEffect( () => {
         if(isRender){
@@ -228,83 +233,76 @@ const People: React.FC<MainProps> = (props) => {
         }
     },[isRender])
     
-    if(isLoading){
-        return(
-            <Text>Is loading</Text>
-        )
-    }
-    else{
-        return(
-            <ScrollView>
-                <View style = {styles.container}>
-                    <View style = {styles.header}>
-                        <TextInput placeholder = {'Search user '} style = { styles.input } onChangeText = { (event) =>  { setFinder(event) } }/>
-                        <TouchableOpacity onPress = { () => { addGroupChat() } } >
-                            <Image source = {group} style = { styles.button } />
-                        </TouchableOpacity>
-                    </View>
-                    <View style = {styles.friendsContainer}>
-                        <Text style = {styles.title}>Friends: </Text>
-                        {
-                            arrayOfFriends.filter( ( friend ) => { 
-                                    const reg: any =  RegExp(`^${finder}\w{0,}`); 
-                                    return friend.name.match(reg) 
-                                } ).map( (friend, index: number) => {
-                                return(
-                                    <View key = {index} style = {styles.frinedContainer}>
-                                        <Text key = {index}>{friend.name}</Text>
-                                        <View style = {styles.buttonContainer}>
-                                            <Checkbox
-                                                color={`green`}
-                                                uncheckedColor={`grey`}
-                                                status={ friend.isChoose ? 'checked' : 'unchecked'}
-                                                onPress = { () => {changeCheck( friend.name, index, 'friend' ) } }
-                                            />
-                                            <TouchableOpacity onPress = { () => { startChat(friend.name) } }>
-                                                <Image source = {messageButton} style = { styles.button }/>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( friend.name ) } }>
-                                                <Image source = {deleteButton} style = { styles.button }/>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                )
-                            })
-                        }
-                    </View>
-                    <View style = {styles.friendsContainer}>
-                        <Text style = {styles.title}>Other Users: </Text>
-                        {
-                            arrayOfOtherUsers.filter( ( user ) => { 
-                                const reg: any =  RegExp(`^${finder}\w{0,}`); 
-                                return user.name.match(reg) 
-                            } ).map( (user: {name: string, isChoose: boolean }, index: number) => {
-                                return(
-                                    <View key = {index} style = {styles.frinedContainer}>
-                                        <Text key = {index}>{user.name}</Text>
-                                        <View style = {styles.buttonContainer}>
-                                            <Checkbox
-                                                color={`green`}
-                                                uncheckedColor={`grey`}
-                                                status={ user.isChoose ? 'checked' : 'unchecked'}
-                                                onPress = { () => {changeCheck( user.name, index, 'other' ) } }
-                                            />
-                                            <TouchableOpacity onPress = { () => { startChat(user.name) } } >
-                                                <Image source = {messageButton} style = { styles.button }/>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( user.name ) } }>
-                                                <Image source = {addButton} style = { styles.button }/>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </View>
-                                )
-                            } )
-                        }       
-                    </View>
+    return(
+        <ScrollView>
+            <View style = {styles.container}>
+                <View style = {styles.header}>
+                    <TextInput placeholder = {'Search user '} style = { styles.input } onChangeText = { (event) =>  { setFinder(event) } }/>
+                    <TouchableOpacity onPress = { () => { addGroupChat() } } >
+                        <Image source = {group} style = { styles.button } />
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
-        )
-    }
+                <View style = {styles.friendsContainer}>
+                    <Text style = {styles.title}>Friends: </Text>
+                    {
+                        arrayOfFriends.filter( ( friend ) => { 
+                                const reg: any =  RegExp(`^${finder}\w{0,}`); 
+                                return friend.name.match(reg) 
+                            } ).map( (friend, index: number) => {
+                            return(
+                                <View key = {index} style = {styles.frinedContainer}>
+                                    <Text key = {index}>{friend.name}</Text>
+                                    <View style = {styles.buttonContainer}>
+                                        <Checkbox
+                                            color={`green`}
+                                            uncheckedColor={`grey`}
+                                            status={ friend.isChoose ? 'checked' : 'unchecked'}
+                                            onPress = { () => {changeCheck( friend.name, index, 'friend' ) } }
+                                        />
+                                        <TouchableOpacity onPress = { () => { startChat(friend.name) } }>
+                                            <Image source = {messageButton} style = { styles.button }/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( friend.name ) } }>
+                                            <Image source = {deleteButton} style = { styles.button }/>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            )
+                        })
+                    }
+                </View>
+                <View style = {styles.friendsContainer}>
+                    <Text style = {styles.title}>Other Users: </Text>
+                    {
+                        arrayOfOtherUsers.filter( ( user ) => { 
+                            const reg: any =  RegExp(`^${finder}\w{0,}`); 
+                            return user.name.match(reg) 
+                        } ).map( (user: {name: string, isChoose: boolean }, index: number) => {
+                            return(
+                                <View key = {index} style = {styles.frinedContainer}>
+                                    <Text key = {index}>{user.name}</Text>
+                                    <View style = {styles.buttonContainer}>
+                                        <Checkbox
+                                            color={`green`}
+                                            uncheckedColor={`grey`}
+                                            status={ user.isChoose ? 'checked' : 'unchecked'}
+                                            onPress = { () => {changeCheck( user.name, index, 'other' ) } }
+                                        />
+                                        <TouchableOpacity onPress = { () => { startChat(user.name) } } >
+                                            <Image source = {messageButton} style = { styles.button }/>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style = {styles.button} onPress = { () => { changeFriends( user.name ) } }>
+                                            <Image source = {addButton} style = { styles.button }/>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            )
+                        } )
+                    }       
+                </View>
+            </View>
+        </ScrollView>
+    )
 
 }
 

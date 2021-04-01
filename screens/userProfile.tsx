@@ -108,14 +108,20 @@ const UserProfile: React.FC<MainProps> = (props) => {
         formData.append(`${key}`, postData[key] )
       }
       formData.append( 'filedata', { type:'image/jpg', uri: result.uri , name:'userPost.jpg'  });
-      fetch('http://192.168.100.88:3000/users/posts/add', {
+      try{
+        fetch('http://192.168.100.88:3000/users/posts/add', {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
           },
           
           body: formData
-      })                
+      }) 
+      }
+      catch(err){
+        console.log(err.message);
+      }
+                     
     }
     else if(!result.cancelled){
       tempArray.push( { 
@@ -137,17 +143,24 @@ const UserProfile: React.FC<MainProps> = (props) => {
         formData.append(`${key}`, postData[key] )
       }
       formData.append( 'filedata', { type:'image/jpg', uri: result.uri , name:'userPost.jpg'  });
-      fetch('http://192.168.100.88:3000/users/posts/add', {
+      try{
+        fetch('http://192.168.100.88:3000/users/posts/add', {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
           },
           
           body: formData
-      })  
-      setIsLoading(true);
+        }) 
+      }
+      catch(err){
+        console.log(err.message);
+      }
+       
+      
       setArrayOfPosts(tempArray);
     }
+    setIsLoading(true);
   }
 
   const takePhotoFromCamera = async() => {
@@ -178,7 +191,7 @@ const UserProfile: React.FC<MainProps> = (props) => {
         formData.append(`${key}`, postData[key] )
       }
       formData.append( 'filedata', { type:'image/jpg', uri: result.uri , name:'userPost.jpg'  });
-      fetch('http://192.168.100.88:3000/users/posts/add', {
+      await fetch('http://192.168.100.88:3000/users/posts/add', {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -208,21 +221,20 @@ const UserProfile: React.FC<MainProps> = (props) => {
       }
       formData.append( 'filedata', { type:'image/jpg', uri: result.uri , name:'userPost.jpg'  });
       fetch('http://192.168.100.88:3000/users/posts/add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          
-          body: formData
-      })  
-      setIsLoading(true);
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        
+        body: formData
+      })
+      
       setArrayOfPosts(tempArray);
     }
-
+    setIsLoading(true);
   }
   
   const deletePost = async(postIDForDelete: string, path: string) => {
-    console.log(postIDForDelete);
     let temp = arrayOfPosts;
     let isDeleteFriendFind = false;
     for(let i = 0; i < temp.length - 1; i++){
@@ -231,15 +243,17 @@ const UserProfile: React.FC<MainProps> = (props) => {
           isDeleteFriendFind = true;
         }
     }
+
     temp.length = temp.length - 1;
-    await fetch('http://192.168.100.88:3000/users/posts/delete', {
+    fetch('http://192.168.100.88:3000/users/posts/delete', {
       method: 'DELETE',
       headers:{
         'Content-Type': 'application/json;charset=utf-8'
       },
-
+      
       body: JSON.stringify( { id: postIDForDelete, path: path} )
     })
+    setIsLoading(true);
     setArrayOfPosts(temp);
   }
 
@@ -272,7 +286,7 @@ const UserProfile: React.FC<MainProps> = (props) => {
     setIsLoading(true);
   }
 
-  const goToComments = (comments: { author: string, data: string, text: string}[], postID: string) => {
+  const goToComments = (comments: { author: string, date: string, text: string}[], postID: string) => {
     props.setArrayOfComments( { comments: comments, postID: postID} );
     props.navigation.navigation.navigate('comments');
   }
@@ -288,6 +302,9 @@ const UserProfile: React.FC<MainProps> = (props) => {
             </TouchableOpacity>
             <TouchableOpacity style = {styles.button} onPress = { takePhotoFromCamera }>
               <Text>add post from camera</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style = {styles.button} onPress = { () => setIsLoading(true) } >
+              <Text>Refresh</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -378,6 +395,7 @@ const styles = StyleSheet.create({
       paddingLeft: 0,
       backgroundColor: '#fff',
       alignItems: 'flex-start',
+      marginBottom: 50
     },
 
     postFooter: {

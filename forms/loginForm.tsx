@@ -51,7 +51,7 @@ const LoginForm: React.FC<Props> = (props) => {
         <View style = {styles.container}>
             <View style = {{marginTop: 150}}>
                 <TextInput style = {styles.input} placeholder = 'Enter your login' onChangeText = { (event) => {setLogin(event)} }/>
-                <TextInput style = {styles.input} placeholder = 'Enter yout password' onChangeText = { (event) => {setPassword(event)} }/>
+                <TextInput style = {styles.input} placeholder = 'Enter yout password' secureTextEntry = {true} onChangeText = { (event) => {setPassword(event)} }/>
                 <TouchableOpacity style = {styles.button} onPress = { () => { loginUser(login, password, props.setUserData, props.navigation) } } >
                     <Text style = { {color: 'white'} } >Log in</Text>
                 </TouchableOpacity>

@@ -18,7 +18,6 @@ const Chat: React.FC<ChatProps> = (props) => {
   
   useEffect(() => {      
     socket.on(`${props.chatInfo._id}::${props.userData.login}`, (data) => {
-      console.log('somedata', data);
       setMessages(previousMessages => GiftedChat.append(previousMessages, data.message));
       socket.removeListener(`${props.chatInfo._id}::${props.userData.login}`, data); 
     } ); 
@@ -30,10 +29,15 @@ const Chat: React.FC<ChatProps> = (props) => {
           method: 'GET',
         });
         let arrayOfMessages = await response.json();
-        console.log(arrayOfMessages.messages);
         if(arrayOfMessages.messages.length > 0){
-          arrayOfMessages.messages.map( ( message ) => {
-            setMessages(previousMessages => GiftedChat.append(previousMessages, message))
+          arrayOfMessages.messages.map( ( message, index: number ) => {
+            if( index === 0 ){
+              setMessages(message);
+            }
+            else{
+              setMessages(previousMessages => GiftedChat.append(previousMessages, message))
+            }
+            
           })
         }
         setIsMessagesGet(true);

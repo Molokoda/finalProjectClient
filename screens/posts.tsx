@@ -16,32 +16,34 @@ const Posts: React.FC<MainProps> = (props) => {
 
     const [arrayOfPosts, setArrayOfPosts] = useState([ {id: '', uri: '', date: '', author: '', likes: [''], comments: [ {author: '', date: '', text: ''} ] } ]);
     const [isLoading, setIsLoading] = useState(true);
-
+    
+    
     useEffect( () => {
-        ( async() => {
-            let response = await fetch('http://192.168.100.88:3000/users/posts/friendsposts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8'
-                },
-                body: JSON.stringify(props.userData.friends)
-            })
-            let arrayOfPosts = await response.json();
-            let correctFiledArray = [{id: '', uri: '', date: '', author: '', likes: [''], comments: [ {author: '', date: '', text: ''} ] }];
-            arrayOfPosts.forEach( (element: {_id: string, author: string, date: string, path: string, likes: string[], comments: [ {author: string, date: string, text: string} ] }, index: number) => {
-                correctFiledArray[index] = {
-                  id: element._id,
-                  uri: ('http://192.168.100.88:3000/public/images/' +  element.path.slice(42)),
-                  date: element.date,
-                  author: element.author,
-                  likes: element.likes,
-                  comments: element.comments
-                }   
-            });
-            setArrayOfPosts( correctFiledArray );
-            setIsLoading( false );
-        })()
-    });
+            ( async() => {
+                let response = await fetch('http://192.168.100.88:3000/users/posts/friendsposts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(props.userData.friends)
+                })
+                let arrayOfPosts = await response.json();
+                let correctFiledArray = [{id: '', uri: '', date: '', author: '', likes: [''], comments: [ {author: '', date: '', text: ''} ] }];
+                arrayOfPosts.forEach( (element: {_id: string, author: string, date: string, path: string, likes: string[], comments: [ {author: string, date: string, text: string} ] }, index: number) => {
+                    correctFiledArray[index] = {
+                    id: element._id,
+                    uri: ('http://192.168.100.88:3000/public/images/' +  element.path.slice(42)),
+                    date: element.date,
+                    author: element.author,
+                    likes: element.likes,
+                    comments: element.comments
+                    }   
+                });
+                setArrayOfPosts( correctFiledArray );
+                setIsLoading( false );
+            })()
+        
+    }, [isLoading]);
 
     const likePost = async( arrayOfUsers: string[], postNumber: number) => {
         let temp = arrayOfPosts;
@@ -72,20 +74,26 @@ const Posts: React.FC<MainProps> = (props) => {
         setIsLoading(true);
     }
 
-    const goToComments = (comments: { author: string, data: string, text: string}[], postID: string)  => {
+    const goToComments = (comments: { author: string, date: string, text: string}[], postID: string)  => {
         props.setArrayOfComments( { comments: comments, postID: postID} );
         props.navigation.navigation.navigate('comments');
     }
 
     if(isLoading){
         return(
-            <Text>Is loading</Text>
+            <View style = { [styles.container, { justifyContent: 'center' }] }>
+                <Text>Is loading</Text>
+            </View>
+            
         )
     }
     else{
         return(
             <ScrollView>
                 <View style = {styles.container}>
+                    <TouchableOpacity style = {styles.button} onPress = { () => setIsLoading(true) } >
+                        <Text>Refresh</Text>
+                    </TouchableOpacity>
                     {
                         arrayOfPosts.slice(0).reverse().map( (post, index) => {
                             let picture;
@@ -104,27 +112,27 @@ const Posts: React.FC<MainProps> = (props) => {
                                 return(
                                     <View key = {index} style = {styles.containerPost}>
                                         <View style = { styles.postHeader}>
-                                        <Text>{post.author}</Text>
+                                            <Text>{post.author}</Text>
                                         </View>
                                         <Image  style = {{ width: 200, height: 300}} source={ {uri: post.uri} }/>
                                         <View style = {styles.postFooter}>
-                                        <Text>{ post.date } </Text>
-                                        <View style = {styles.like}>
-                                            <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
-                                                <Image 
-                                                    style = { { width: 16, height: 16}} 
-                                                    source = { picture }
-                                                />
-                                            </TouchableOpacity>
-                                            <Text> { post.likes.length } </Text>
-                                            <TouchableOpacity onPress = { () => { goToComments(post.comments , post.id) } } >
-                                                <Image 
-                                                    style = { { width: 24, height: 16} } 
-                                                    source = {  comment } 
-                                                />
-                                            </TouchableOpacity>
-                                            <Text> { post.comments.length } </Text>
-                                        </View>
+                                            <Text>{ post.date } </Text>
+                                            <View style = {styles.like}>
+                                                <TouchableOpacity onPress = { () => { likePost( post.likes, index ) } }>
+                                                    <Image 
+                                                        style = { { width: 16, height: 16}} 
+                                                        source = { picture }
+                                                    />
+                                                </TouchableOpacity>
+                                                <Text> { post.likes.length } </Text>
+                                                <TouchableOpacity onPress = { () => { goToComments(post.comments , post.id) } } >
+                                                    <Image 
+                                                        style = { { width: 24, height: 16} } 
+                                                        source = {  comment } 
+                                                    />
+                                                </TouchableOpacity>
+                                                <Text> { post.comments.length } </Text>
+                                            </View>
                                         </View>
                                     </View>
                                 )
@@ -163,6 +171,7 @@ const styles = StyleSheet.create({
         paddingLeft: 0,
         backgroundColor: '#fff',
         alignItems: 'flex-start',
+        marginBottom: 20
       },
   
       postFooter: {
@@ -181,7 +190,15 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         alignItems: 'center',
         justifyContent: 'flex-end'
-      }
+      },
+
+      button: {
+        padding: 10,
+        alignItems: 'center',
+        backgroundColor: 'skyblue',
+        borderRadius: 10,
+        marginBottom: 10
+      },
 });
 
 export default Posts;

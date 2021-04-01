@@ -31,6 +31,7 @@
     "react-native-update-gradle": "^1.2.0",
     "react-native-uuid": "^1.4.9",
     "react-native-uuid-generator": "^6.1.1",
+    "react-native-vector-icons": "^8.0.0",
     "react-native-web": "~0.13.12",
     "socket.io-client": "^3.1.1"
   },
@@ -41,6 +42,7 @@
     "@types/react-native": "~0.63.2",
     "@types/react-native-fetch-blob": "^0.10.5",
     "@types/react-native-uuid-generator": "^4.0.0",
+    "@types/react-native-vector-icons": "^6.4.6",
     "typescript": "~4.0.0"
   },
   "private": true
